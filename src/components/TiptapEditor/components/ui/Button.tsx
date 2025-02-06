@@ -1,49 +1,22 @@
-import React from "react";
-import clsx from "clsx";
+import React, { ButtonHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "destructive" | "outline" | "ghost";
-  iconOnly?: boolean;
-  slotBefore?: React.ReactNode;
-  slotAfter?: React.ReactNode;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'solid' | 'outline';
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      children,
-      type = "button",
-      variant = "primary",
-      iconOnly,
-      slotBefore,
-      slotAfter,
-      ...props
-    },
-    ref
-  ) => {
-    const classes = clsx(
-      "rte-button",
-      `rte-button--${variant}`,
-      iconOnly && "rte-button--icon-only",
-      className
-    );
-
-    return (
-      <button ref={ref} type={type} className={classes} {...props}>
-        {!iconOnly && slotBefore}
-        {children &&
-          (iconOnly || (!slotAfter && !slotBefore) ? (
-            children
-          ) : (
-            <span className="rte-button__text">{children}</span>
-          ))}
-        {!iconOnly && slotAfter}
-      </button>
-    );
-  }
-);
-
-Button.displayName = "Button";
+const Button = ({ className, variant = 'solid', ...props }: ButtonProps) => {
+  return (
+    <button
+      className={cn(
+        "rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        variant === 'solid' && "bg-blue-600 text-white hover:bg-blue-700",
+        variant === 'outline' && "border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800",
+        className
+      )}
+      {...props}
+    />
+  );
+};
 
 export default Button;

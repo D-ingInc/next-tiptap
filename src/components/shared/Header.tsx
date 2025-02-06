@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const Header = () => {
   const pathname = usePathname();
-  const isEditPage = pathname === "/";
+  const isEditPage = pathname === "/" || pathname === "/new";
 
   return (
     <header className="sticky z-50 top-0 px-6 border-b border-neutral-300 dark:border-neutral-700 bg-white/20 dark:bg-[#0d101820] backdrop-blur-lg">
@@ -17,12 +17,20 @@ const Header = () => {
         <Link href="/">
           <Logo width={100} />
         </Link>
-        <Link
-          href={isEditPage ? "/post-csr" : "/"}
-          className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-        >
-          {isEditPage ? "View Post" : "Edit Post"}
-        </Link>
+        <div className="flex gap-4">
+          <Link
+            href="/posts"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            記事一覧
+          </Link>
+          <Link
+            href={isEditPage ? "/post-csr" : "/new"}
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            {isEditPage ? "プレビュー" : "新規作成"}
+          </Link>
+        </div>
         <div className="flex gap-5">
           <ThemeSwitcher />
           <Link href="https://github.com/ndtrung341/next-tiptap">
