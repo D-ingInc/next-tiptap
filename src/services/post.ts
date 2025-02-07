@@ -18,13 +18,15 @@ export const getPost = (): Promise<any> => {
   });
 };
 
-export const savePost = (data: any) => {
-  if (typeof window === "undefined") return;
-
-  try {
-    const value = data?.content?.trim() ? { ...mock, ...data } : mock;
-    localStorage.setItem("post", JSON.stringify(value));
-  } catch (error) {
-    console.error("Error saving to localStorage:", error);
-  }
-};
+export async function savePost(data: {
+  title: string;
+  content: string;
+  imageFile?: { filename: string; data: string; mimeType: string };
+}) {
+  const response = await fetch("/api/articles", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}

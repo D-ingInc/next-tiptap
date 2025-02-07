@@ -9,74 +9,70 @@ interface PostForm {
 }
 
 export default function EditForm() {
+  const { register, handleSubmit, control, reset } = useForm<PostForm>();
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const editorRef = useRef<TiptapEditorRef>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { control, reset, watch } = useForm<PostForm>();
-
-  const getWordCount = useCallback(
-    () => editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0,
-    [editorRef.current]
-  );
 
   useEffect(() => {
-    getPost().then((post) => {
-      reset({ ...post });
-      setIsLoading(false);
+    getPost().then((data) => {
+      reset({
+        title: data.title,
+        content: data.content,
+      });
     });
-  }, []);
+  }, [reset]);
 
-  useEffect(() => {
-    const subscription = watch((values, { type }) => {
-      if (type === "change") {
-        savePost({ ...values, wordCount: getWordCount() });
+  const onSubmit = async (data: PostForm) => {
+    setLoading(true);
+    setMessage("");
+    try {
+      const response = await savePost(data);
+      if (response.success) {
+        setMessage("保存に成功しました！");
+      } else {
+        setMessage("保存に失敗しました。");
       }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  if (isLoading) return;
+    } catch (error: any) {
+      console.error("記事保存エラー:", error);
+      setMessage("保存中にエラーが発生しました。");
+    }
+    setLoading(false);
+  };
 
   return (
-    <div className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <label className="inline-block font-medium dark:text-white mb-2">Title</label>
-        <Controller
-          control={control}
-          name="title"
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-md bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
-              placeholder="Enter post title..."
-            />
-          )}
+        <input
+          type="text"
+          {...register("title", { required: true })}
+          className="w-full px-4 py-2.5 shadow border border-[#d1d9e0] rounded-md bg-white dark:bg-[#0d1017] dark:text-white dark:border-[#3d444d] outline-none"
+          placeholder="Enter post title..."
         />
       </div>
-
       <div>
-        <label className="inline-block font-medium dark:text-white mb-2">Content</label>
+        <label>内容</label>
         <Controller
-          control={control}
           name="content"
+          control={control}
           render={({ field }) => (
             <TiptapEditor
-              ref={editorRef}
-              ssr={true}
-              output="html"
-              placeholder={{
-                paragraph: "Type your content here...",
-                imageCaption: "Type caption for image (optional)",
-              }}
-              contentMinHeight={256}
-              contentMaxHeight={640}
-              onContentChange={field.onChange}
               initialContent={field.value}
+              onContentChange={field.onChange}
+              ref={editorRef}
             />
           )}
         />
       </div>
-    </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors"
+      >
+        {loading ? "保存中..." : "保存"}
+      </button>
+      {message && <p>{message}</p>}
+    </form>
   );
 }
