@@ -29,13 +29,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({onInsert, onClose}) => {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
-    const confirmUpload = window.confirm(
-      "Please avoid uploading too many images unnecessarily to save storage space. Also, ensure your images comply with copyright rules. Do you wish to continue?"
-    );
-
-    if (confirmUpload) {
       fileInput.current?.click();
-    }
   };
 
   const loadImage = (file: File): Promise<ImageData> => {
@@ -87,7 +81,8 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({onInsert, onClose}) => {
 
     loadedPreviews.forEach(preview => URL.revokeObjectURL(preview.url));
     setPreviews([]);
-    setImages(prev => [...uploadImages, ...prev]);
+    const uploaded = uploadImages.filter((img) => img);
+    setImages(prev => [...uploaded, ...prev]);
     setUploading(false);
   };
 
@@ -100,7 +95,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({onInsert, onClose}) => {
         setLoading(true);
         const response = await fetch('/api/images');
         const data = await response.json();
-        setImages(data);
+        setImages(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching images:', error);
       } finally {
@@ -122,7 +117,7 @@ const MediaLibrary: React.FC<MediaLibraryProps> = ({onInsert, onClose}) => {
         {loading ? (
           <div className="media-library__spinner" aria-label="Loading images"/>
         ) : (
-          <MediaGallery data={[...previews, ...images]} onSelect={setSelected} selected={selected}/>
+          <MediaGallery data={[...previews, ...(Array.isArray(images) ? images : [])]} onSelect={setSelected} selected={selected}/>
         )}
       </div>
 

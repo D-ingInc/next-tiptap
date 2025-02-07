@@ -17,7 +17,7 @@ export default function useTiptapEditor({
   ...editorOptions
 }: UseTiptapEditorOptions) {
   const forceUpdate = useForceUpdate();
-  const editor = useEditor(editorOptions, []);
+  const editor = useEditor({ ...editorOptions, immediatelyRender: false }, []);
 
   useImperativeHandle(
     ref,

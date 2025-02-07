@@ -31,7 +31,6 @@ const MediaGallery: React.FC<MediaGalleryProps> = ({data, selected, onSelect}) =
           <div className="media-item__info">
             <div className="media-item__name">{image.display_name}</div>
             <div className="media-item__details">
-              <span>{image.format.toUpperCase()}</span>
               <span> • </span>
               <span>{image?.width} x {image?.height}</span>
             </div>
